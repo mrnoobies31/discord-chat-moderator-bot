@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="description" content="Meet your Discord moderation bot: a lightweight helper that keeps conversations cleaner and moderators informed.">
+  <title>Discord Moderation Bot</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20251f;
+      --muted: #667067;
+      --paper: #f5f4ef;
+      --card: #fffefa;
+      --line: #e5e6dc;
+      --green: #496c50;
+      --green-dark: #2c4b36;
+      --lime: #d9ed8d;
+      --peach: #f5d9c6;
+      --lavender: #dedaf5;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+    a { color: inherit; }
+    .shell { max-width: 1160px; margin: 0 auto; padding: 0 30px; }
+    .topbar {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; font-weight: 760; letter-spacing: -.035em; }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px 12px 12px 5px;
+      background: var(--green-dark);
+      color: white;
+      font-size: 17px;
+    }
+    .nav { display: flex; align-items: center; gap: 30px; color: #505950; font-size: 13px; font-weight: 600; }
+    .nav a { text-decoration: none; }
+    .nav a:hover { color: var(--green-dark); }
+    .hero {
+      padding: 90px 0 76px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      align-items: center;
+      gap: 64px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--green-dark);
+      text-transform: uppercase;
+      letter-spacing: .13em;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .eyebrow::before { content: ""; width: 20px; height: 1px; background: var(--green); }
+    h1 {
+      max-width: 590px;
+      margin: 20px 0 18px;
+      font-size: clamp(48px, 7vw, 78px);
+      line-height: .99;
+      letter-spacing: -.075em;
+      font-weight: 680;
+    }
+    h1 em { color: var(--green); font-family: Georgia, serif; font-weight: 400; }
+    .intro { max-width: 470px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
+    .actions { display: flex; gap: 12px; margin-top: 30px; }
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 19px;
+      border: 1px solid var(--green-dark);
+      border-radius: 7px;
+      background: var(--green-dark);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .18s ease, background .18s ease;
+    }
+    .button:hover { transform: translateY(-2px); background: #3b6045; }
+    .button.secondary { background: transparent; color: var(--ink); border-color: var(--line); }
+    .button.secondary:hover { background: white; }
+    .hero-art {
+      min-height: 350px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #e9ebdd;
+    }
+    .sun { position: absolute; width: 228px; height: 228px; top: 35px; right: 42px; border-radius: 50%; background: var(--lime); }
+    .orb { position: absolute; width: 88px; height: 88px; bottom: 33px; left: 37px; border-radius: 50%; background: var(--peach); }
+    .bot-card {
+      z-index: 1;
+      width: min(285px, 78%);
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 13px;
+      background: rgba(255,254,250,.94);
+      box-shadow: 0 18px 45px rgba(42,61,42,.12);
+      transform: rotate(-3deg);
+    }
+    .bot-card-head { display: flex; align-items: center; gap: 12px; padding-bottom: 17px; border-bottom: 1px solid var(--line); }
+    .bot-avatar {
+      width: 41px; height: 41px; display: grid; place-items: center;
+      border-radius: 14px; background: var(--lavender); font-size: 21px;
+    }
+    .bot-name { font-size: 12px; font-weight: 750; }
+    .bot-sub { margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .notice {
+      margin-top: 17px; padding: 13px; border-radius: 8px;
+      background: #f2f3e9; font-size: 11px;
+    }
+    .notice strong { display: block; margin-bottom: 5px; color: var(--green-dark); font-size: 10px; }
+    .notice span { color: #60695f; }
+    .mini-status { display: flex; align-items: center; gap: 7px; margin-top: 14px; color: var(--muted); font-size: 9px; }
+    .mini-status i { width: 7px; height: 7px; border-radius: 50%; background: #8d9d78; }
+    .section { padding: 70px 0 78px; border-top: 1px solid var(--line); }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 25px; margin-bottom: 30px; }
+    .section h2 { margin: 10px 0 0; font-size: clamp(30px, 4vw, 43px); line-height: 1.1; letter-spacing: -.055em; font-weight: 650; }
+    .section-copy { max-width: 350px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.75; }
+    .checks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
+    .check {
+      min-height: 201px;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--card);
+    }
+    .check-number { color: var(--green); font-family: Georgia, serif; font-size: 15px; font-style: italic; }
+    .check h3 { margin: 32px 0 8px; font-size: 15px; letter-spacing: -.02em; }
+    .check p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+    .loading { grid-column: 1 / -1; padding: 24px; color: var(--muted); font-size: 13px; }
+    .error { color: #9b332a; }
+    .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .flow-item { padding: 21px; border-radius: 9px; background: #eceee4; }
+    .flow-item:nth-child(2) { background: #e9e5f5; }
+    .flow-item:nth-child(3) { background: #f4e5d9; }
+    .flow-item span { color: var(--muted); font-family: Georgia, serif; font-size: 13px; font-style: italic; }
+    .flow-item p { margin: 21px 0 0; font-size: 14px; font-weight: 650; }
+    .note { margin: 18px 0 0; color: var(--muted); font-size: 11px; }
+    footer { padding: 23px 0 30px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    footer .shell { display: flex; justify-content: space-between; gap: 20px; }
+    @media (max-width: 760px) {
+      .shell { padding: 0 20px; }
+      .topbar { height: 70px; }
+      .nav { gap: 16px; font-size: 11px; }
+      .hero { grid-template-columns: 1fr; gap: 38px; padding: 63px 0 55px; }
+      .hero-art { min-height: 300px; }
+      .section { padding: 54px 0 60px; }
+      .checks { grid-template-columns: repeat(2, 1fr); }
+      .section-head { align-items: start; flex-direction: column; }
+    }
+    @media (max-width: 480px) {
+      .nav a:first-child { display: none; }
+      .checks, .flow { grid-template-columns: 1fr; }
+      .check { min-height: 166px; }
+      .check h3 { margin-top: 22px; }
+      .actions { flex-wrap: wrap; }
+      footer .shell { flex-direction: column; gap: 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell topbar">
+    <a class="brand" href="#" aria-label="Discord Moderation Bot home">
+      <span class="brand-mark" aria-hidden="true">✳</span>
+      <span>Mod, simply.</span>
+    </a>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#checks">What it catches</a>
+      <a href="#how-it-works">How it works</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="shell hero" aria-labelledby="hero-title">
+      <div>
+        <div class="eyebrow">A calmer corner of Discord</div>
+        <h1 id="hero-title">Good chats.<br><em>Less noise.</em></h1>
+        <p class="intro">A lightweight moderation bot that helps keep conversations kind, readable, and a little easier to manage.</p>
+        <div class="actions">
+          <a class="button" href="#checks">Explore the safeguards <span aria-hidden="true">&nbsp;↗</span></a>
+          <a class="button secondary" href="#how-it-works">How it works</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Illustration of a moderation notice">
+        <div class="sun"></div>
+        <div class="orb"></div>
+        <div class="bot-card">
+          <div class="bot-card-head">
+            <div class="bot-avatar" aria-hidden="true">✳</div>
+            <div>
+              <div class="bot-name">Your moderation bot</div>
+              <div class="bot-sub">A little help behind the scenes</div>
+            </div>
+          </div>
+          <div class="notice">
+            <strong>MESSAGE REMOVED</strong>
+            <span>A moderator-friendly nudge has been sent to the author.</span>
+          </div>
+          <div class="mini-status"><i aria-hidden="true"></i> Designed for thoughtful moderation</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="checks" aria-labelledby="checks-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Clear rules, kinder spaces</div>
+            <h2 id="checks-title">A few thoughtful<br>checks.</h2>
+          </div>
+          <p class="section-copy">The bot watches for the same kinds of disruption each time, so your moderators can focus on the community—not the cleanup.</p>
+        </div>
+        <div class="checks" id="check-list" aria-live="polite">
+          <p class="loading">Loading moderation checks…</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works" aria-labelledby="flow-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">A simple, consistent response</div>
+            <h2 id="flow-title">When a rule is<br>crossed.</h2>
+          </div>
+          <p class="section-copy">Each flagged message follows the same moderation flow. Logging is available when a moderation channel is configured.</p>
+        </div>
+        <div class="flow" id="response-list">
+          <div class="flow-item"><span>First</span><p>The message is removed.</p></div>
+          <div class="flow-item"><span>Then</span><p>The author receives a brief warning.</p></div>
+          <div class="flow-item"><span>When configured</span><p>The incident is sent to the moderation log channel.</p></div>
+        </div>
+        <p class="note">This is an informational companion site; it does not connect to or display the bot's live Discord status.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <span>Made for better conversations.</span>
+      <span>Discord Moderation Bot · Companion site</span>
+    </div>
+  </footer>
+
+  <script>
+    async function loadBotInfo() {
+      const list = document.querySelector("#check-list");
+      try {
+        const response = await fetch("/api/bot-info");
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}`);
+        }
+        const info = await response.json();
+        if (!Array.isArray(info.checks) || !Array.isArray(info.response)) {
+          throw new Error("The bot information response is incomplete");
+        }
+
+        const cards = info.checks.map((check) => {
+          const card = document.createElement("article");
+          card.className = "check";
+          const number = document.createElement("span");
+          number.className = "check-number";
+          number.textContent = check.number;
+          const title = document.createElement("h3");
+          title.textContent = check.title;
+          const description = document.createElement("p");
+          description.textContent = check.description;
+          card.append(number, title, description);
+          return card;
+        });
+        list.replaceChildren(...cards);
+
+        const responseList = document.querySelector("#response-list");
+        responseList.replaceChildren(...info.response.map((item, index) => {
+          const step = document.createElement("div");
+          step.className = "flow-item";
+          const label = document.createElement("span");
+          label.textContent = ["First", "Then", "When configured"][index] || "Also";
+          const description = document.createElement("p");
+          description.textContent = item;
+          step.append(label, description);
+          return step;
+        }));
+      } catch (error) {
+        list.replaceChildren();
+        const message = document.createElement("p");
+        message.className = "loading error";
+        message.textContent = "Moderation details could not be loaded. Make sure the Java website server is running.";
+        list.append(message);
+        console.error("Unable to load bot information:", error);
+      }
+    }
+
+    loadBotInfo();
+  </script>
+</body>
+</html>
